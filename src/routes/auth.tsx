@@ -24,8 +24,10 @@ function AuthPage() {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, s) => {
-      if (s) navigate({ to: "/timeline" });
+    // Only navigate on a real sign-in event. Reacting to every event
+    // (INITIAL_SESSION, TOKEN_REFRESHED) caused stray redirects mid-session.
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, s) => {
+      if (event === "SIGNED_IN" && s) navigate({ to: "/timeline" });
     });
     return () => subscription.unsubscribe();
   }, [navigate]);

@@ -27,7 +27,7 @@ function AuthedLayout() {
         <Outlet />
       </main>
       <nav className="fixed bottom-0 inset-x-0 border-t border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/70">
-        <div className="mx-auto max-w-md grid grid-cols-3">
+        <div className="mx-auto max-w-md grid grid-cols-4">
           <Link
             to="/timeline"
             className="flex flex-col items-center gap-1 py-3 text-xs text-muted-foreground [&.active]:text-primary"
@@ -42,7 +42,15 @@ function AuthedLayout() {
             activeProps={{ className: "active" }}
           >
             <Brain className="h-5 w-5" />
-            Brain dump
+            Dump
+          </Link>
+          <Link
+            to="/insights"
+            className="flex flex-col items-center gap-1 py-3 text-xs text-muted-foreground [&.active]:text-primary"
+            activeProps={{ className: "active" }}
+          >
+            <BarChart3 className="h-5 w-5" />
+            Insights
           </Link>
           <button
             onClick={async () => {

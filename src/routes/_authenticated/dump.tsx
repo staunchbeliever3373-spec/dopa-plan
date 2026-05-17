@@ -3,8 +3,10 @@ import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { parseBrainDump } from "@/lib/brain-dump.functions";
+import { logEngagement } from "@/lib/coach.functions";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { VoiceButton } from "@/components/voice-button";
 import { toast } from "sonner";
 import { Sparkles, ArrowLeft } from "lucide-react";
 
@@ -15,6 +17,7 @@ export const Route = createFileRoute("/_authenticated/dump")({
 function DumpPage() {
   const navigate = useNavigate();
   const parseFn = useServerFn(parseBrainDump);
+  const logFn = useServerFn(logEngagement);
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
 
@@ -32,17 +35,17 @@ function DumpPage() {
         .single();
       if (error) throw error;
 
+      if ("vibrate" in navigator) navigator.vibrate?.([8, 30, 8]);
       toast.success("Got it. Working on it in the background.", {
         description: "You can leave this screen.",
       });
       setText("");
       navigate({ to: "/timeline" });
 
-      // Fire and forget — AI parsing happens server-side
+      // Fire and forget
+      logFn({ data: { kind: "brain_dump" } }).catch(() => {});
       parseFn({ data: { dump_id: dump.id, raw_text: text.trim() } })
-        .then((r) => {
-          toast.success(`Parsed ${r.created} task${r.created === 1 ? "" : "s"}`);
-        })
+        .then((r) => toast.success(`Parsed ${r.created} task${r.created === 1 ? "" : "s"}`))
         .catch(() => toast.error("Couldn't parse that dump"));
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to save");
@@ -75,15 +78,18 @@ function DumpPage() {
         className="min-h-[40vh] text-base leading-relaxed border-0 bg-card resize-none focus-visible:ring-1"
       />
 
-      <Button
-        onClick={onSubmit}
-        disabled={busy || !text.trim()}
-        size="lg"
-        className="w-full mt-5 gap-2"
-      >
-        <Sparkles className="h-4 w-4" />
-        Send to my plan
-      </Button>
+      <div className="flex items-center gap-3 mt-5">
+        <VoiceButton onAppend={(t) => setText((prev) => (prev ? `${prev.trimEnd()} ${t}` : t))} />
+        <Button
+          onClick={onSubmit}
+          disabled={busy || !text.trim()}
+          size="lg"
+          className="flex-1 gap-2 h-12"
+        >
+          <Sparkles className="h-4 w-4" />
+          Send to my plan
+        </Button>
+      </div>
     </div>
   );
 }

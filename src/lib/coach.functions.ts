@@ -60,10 +60,11 @@ export const breakDownTask = createServerFn({ method: "POST" })
     let steps: z.infer<typeof Sub>[] = [];
     try {
       const obj = JSON.parse(content);
-      steps = (Array.isArray(obj.steps) ? obj.steps : [])
-        .map((s: unknown) => Sub.safeParse(s))
-        .filter((r: z.SafeParseReturnType<unknown, z.infer<typeof Sub>>) => r.success)
-        .map((r) => (r as z.SafeParseSuccess<z.infer<typeof Sub>>).data);
+      const raw = Array.isArray(obj.steps) ? obj.steps : [];
+      for (const s of raw) {
+        const r = Sub.safeParse(s);
+        if (r.success) steps.push(r.data);
+      }
     } catch { /* noop */ }
 
     if (steps.length === 0) return { created: 0 };

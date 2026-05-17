@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedTimelineRouteImport } from './routes/_authenticated/timeline'
 import { Route as AuthenticatedDumpRouteImport } from './routes/_authenticated/dump'
+import { Route as ApiPublicRolloverRouteImport } from './routes/api/public/rollover'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -39,18 +40,25 @@ const AuthenticatedDumpRoute = AuthenticatedDumpRouteImport.update({
   path: '/dump',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const ApiPublicRolloverRoute = ApiPublicRolloverRouteImport.update({
+  id: '/api/public/rollover',
+  path: '/api/public/rollover',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/dump': typeof AuthenticatedDumpRoute
   '/timeline': typeof AuthenticatedTimelineRoute
+  '/api/public/rollover': typeof ApiPublicRolloverRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/dump': typeof AuthenticatedDumpRoute
   '/timeline': typeof AuthenticatedTimelineRoute
+  '/api/public/rollover': typeof ApiPublicRolloverRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -59,12 +67,13 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_authenticated/dump': typeof AuthenticatedDumpRoute
   '/_authenticated/timeline': typeof AuthenticatedTimelineRoute
+  '/api/public/rollover': typeof ApiPublicRolloverRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/dump' | '/timeline'
+  fullPaths: '/' | '/auth' | '/dump' | '/timeline' | '/api/public/rollover'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/dump' | '/timeline'
+  to: '/' | '/auth' | '/dump' | '/timeline' | '/api/public/rollover'
   id:
     | '__root__'
     | '/'
@@ -72,12 +81,14 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_authenticated/dump'
     | '/_authenticated/timeline'
+    | '/api/public/rollover'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AuthRoute: typeof AuthRoute
+  ApiPublicRolloverRoute: typeof ApiPublicRolloverRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -117,6 +128,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDumpRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/api/public/rollover': {
+      id: '/api/public/rollover'
+      path: '/api/public/rollover'
+      fullPath: '/api/public/rollover'
+      preLoaderRoute: typeof ApiPublicRolloverRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -138,7 +156,18 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AuthRoute: AuthRoute,
+  ApiPublicRolloverRoute: ApiPublicRolloverRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

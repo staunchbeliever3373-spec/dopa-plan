@@ -1,0 +1,1 @@
+grant execute on function public.rollover_unfinished_tasks() to anon, authenticated;

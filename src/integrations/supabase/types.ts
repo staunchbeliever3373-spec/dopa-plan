@@ -14,7 +14,167 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      brain_dump_items: {
+        Row: {
+          category: string | null
+          created_at: string
+          dump_id: string
+          id: string
+          task_id: string | null
+          text: string
+          user_id: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          dump_id: string
+          id?: string
+          task_id?: string | null
+          text: string
+          user_id: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          dump_id?: string
+          id?: string
+          task_id?: string | null
+          text?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brain_dump_items_dump_id_fkey"
+            columns: ["dump_id"]
+            isOneToOne: false
+            referencedRelation: "brain_dumps"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "brain_dump_items_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      brain_dumps: {
+        Row: {
+          created_at: string
+          error: string | null
+          id: string
+          raw_text: string
+          status: Database["public"]["Enums"]["dump_status"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          error?: string | null
+          id?: string
+          raw_text: string
+          status?: Database["public"]["Enums"]["dump_status"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          error?: string | null
+          id?: string
+          raw_text?: string
+          status?: Database["public"]["Enums"]["dump_status"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          display_name: string | null
+          id: string
+          timezone: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          display_name?: string | null
+          id: string
+          timezone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          timezone?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      tasks: {
+        Row: {
+          color_token: string | null
+          completed_at: string | null
+          created_at: string
+          duration_minutes: number | null
+          energy_required: Database["public"]["Enums"]["energy_level"] | null
+          id: string
+          notes: string | null
+          parent_task_id: string | null
+          scheduled_for: string | null
+          source: string | null
+          started_at: string | null
+          status: Database["public"]["Enums"]["task_status"]
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          color_token?: string | null
+          completed_at?: string | null
+          created_at?: string
+          duration_minutes?: number | null
+          energy_required?: Database["public"]["Enums"]["energy_level"] | null
+          id?: string
+          notes?: string | null
+          parent_task_id?: string | null
+          scheduled_for?: string | null
+          source?: string | null
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["task_status"]
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          color_token?: string | null
+          completed_at?: string | null
+          created_at?: string
+          duration_minutes?: number | null
+          energy_required?: Database["public"]["Enums"]["energy_level"] | null
+          id?: string
+          notes?: string | null
+          parent_task_id?: string | null
+          scheduled_for?: string | null
+          source?: string | null
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["task_status"]
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tasks_parent_task_id_fkey"
+            columns: ["parent_task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +183,9 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      dump_status: "pending" | "processing" | "parsed" | "failed"
+      energy_level: "low" | "medium" | "high"
+      task_status: "inbox" | "scheduled" | "active" | "done" | "dropped"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +312,10 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      dump_status: ["pending", "processing", "parsed", "failed"],
+      energy_level: ["low", "medium", "high"],
+      task_status: ["inbox", "scheduled", "active", "done", "dropped"],
+    },
   },
 } as const

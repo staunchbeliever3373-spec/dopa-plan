@@ -1,7 +1,5 @@
 import { createFileRoute, redirect, Outlet, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/hooks/use-auth";
 import { Brain, Calendar, LogOut, BarChart3, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeBootstrap } from "@/components/theme-bootstrap";
@@ -15,12 +13,11 @@ export const Route = createFileRoute("/_authenticated")({
 });
 
 function AuthedLayout() {
-  const { user, loading } = useAuth();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    if (!loading && !user) navigate({ to: "/auth" });
-  }, [loading, user, navigate]);
+  // No useEffect-based redirect here. beforeLoad gates the route, and the
+  // root onAuthStateChange listener invalidates the router on real sign-out,
+  // which re-runs beforeLoad. Redirecting on transient null-user states
+  // (token refresh, remount) was kicking signed-in users back to /auth.
 
   return (
     <div className="min-h-screen flex flex-col bg-background">

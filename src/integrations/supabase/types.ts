@@ -89,6 +89,54 @@ export type Database = {
         }
         Relationships: []
       }
+      energy_states: {
+        Row: {
+          id: string
+          level: Database["public"]["Enums"]["energy_level"]
+          logged_at: string
+          note: string | null
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          level: Database["public"]["Enums"]["energy_level"]
+          logged_at?: string
+          note?: string | null
+          user_id: string
+        }
+        Update: {
+          id?: string
+          level?: Database["public"]["Enums"]["energy_level"]
+          logged_at?: string
+          note?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      engagement_events: {
+        Row: {
+          id: string
+          kind: string
+          metadata: Json | null
+          occurred_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          kind: string
+          metadata?: Json | null
+          occurred_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          kind?: string
+          metadata?: Json | null
+          occurred_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -180,7 +228,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      rollover_unfinished_tasks: { Args: never; Returns: number }
     }
     Enums: {
       dump_status: "pending" | "processing" | "parsed" | "failed"

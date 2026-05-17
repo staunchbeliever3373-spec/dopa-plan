@@ -13,6 +13,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedTimelineRouteImport } from './routes/_authenticated/timeline'
+import { Route as AuthenticatedInsightsRouteImport } from './routes/_authenticated/insights'
 import { Route as AuthenticatedDumpRouteImport } from './routes/_authenticated/dump'
 import { Route as ApiPublicRolloverRouteImport } from './routes/api/public/rollover'
 
@@ -35,6 +36,11 @@ const AuthenticatedTimelineRoute = AuthenticatedTimelineRouteImport.update({
   path: '/timeline',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedInsightsRoute = AuthenticatedInsightsRouteImport.update({
+  id: '/insights',
+  path: '/insights',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedDumpRoute = AuthenticatedDumpRouteImport.update({
   id: '/dump',
   path: '/dump',
@@ -50,6 +56,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/dump': typeof AuthenticatedDumpRoute
+  '/insights': typeof AuthenticatedInsightsRoute
   '/timeline': typeof AuthenticatedTimelineRoute
   '/api/public/rollover': typeof ApiPublicRolloverRoute
 }
@@ -57,6 +64,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/dump': typeof AuthenticatedDumpRoute
+  '/insights': typeof AuthenticatedInsightsRoute
   '/timeline': typeof AuthenticatedTimelineRoute
   '/api/public/rollover': typeof ApiPublicRolloverRoute
 }
@@ -66,20 +74,34 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/dump': typeof AuthenticatedDumpRoute
+  '/_authenticated/insights': typeof AuthenticatedInsightsRoute
   '/_authenticated/timeline': typeof AuthenticatedTimelineRoute
   '/api/public/rollover': typeof ApiPublicRolloverRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/dump' | '/timeline' | '/api/public/rollover'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/dump'
+    | '/insights'
+    | '/timeline'
+    | '/api/public/rollover'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/dump' | '/timeline' | '/api/public/rollover'
+  to:
+    | '/'
+    | '/auth'
+    | '/dump'
+    | '/insights'
+    | '/timeline'
+    | '/api/public/rollover'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
     | '/_authenticated/dump'
+    | '/_authenticated/insights'
     | '/_authenticated/timeline'
     | '/api/public/rollover'
   fileRoutesById: FileRoutesById
@@ -121,6 +143,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTimelineRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/insights': {
+      id: '/_authenticated/insights'
+      path: '/insights'
+      fullPath: '/insights'
+      preLoaderRoute: typeof AuthenticatedInsightsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/dump': {
       id: '/_authenticated/dump'
       path: '/dump'
@@ -140,11 +169,13 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteChildren {
   AuthenticatedDumpRoute: typeof AuthenticatedDumpRoute
+  AuthenticatedInsightsRoute: typeof AuthenticatedInsightsRoute
   AuthenticatedTimelineRoute: typeof AuthenticatedTimelineRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDumpRoute: AuthenticatedDumpRoute,
+  AuthenticatedInsightsRoute: AuthenticatedInsightsRoute,
   AuthenticatedTimelineRoute: AuthenticatedTimelineRoute,
 }
 
@@ -161,3 +192,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

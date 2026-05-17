@@ -2,8 +2,9 @@ import { createFileRoute, redirect, Outlet, Link, useNavigate } from "@tanstack/
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
-import { Brain, Calendar, LogOut, BarChart3 } from "lucide-react";
+import { Brain, Calendar, LogOut, BarChart3, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ThemeBootstrap } from "@/components/theme-bootstrap";
 
 export const Route = createFileRoute("/_authenticated")({
   beforeLoad: async () => {
@@ -23,11 +24,12 @@ function AuthedLayout() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <ThemeBootstrap />
       <main className="flex-1 pb-20">
         <Outlet />
       </main>
       <nav className="fixed bottom-0 inset-x-0 border-t border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/70">
-        <div className="mx-auto max-w-md grid grid-cols-4">
+        <div className="mx-auto max-w-md grid grid-cols-5">
           <Link
             to="/timeline"
             className="flex flex-col items-center gap-1 py-3 text-xs text-muted-foreground [&.active]:text-primary"
@@ -51,6 +53,14 @@ function AuthedLayout() {
           >
             <BarChart3 className="h-5 w-5" />
             Insights
+          </Link>
+          <Link
+            to="/settings"
+            className="flex flex-col items-center gap-1 py-3 text-xs text-muted-foreground [&.active]:text-primary"
+            activeProps={{ className: "active" }}
+          >
+            <Settings className="h-5 w-5" />
+            Theme
           </Link>
           <button
             onClick={async () => {

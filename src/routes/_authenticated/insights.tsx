@@ -1,7 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
-import { Flame, Sparkles, Battery } from "lucide-react";
+import { Flame, Sparkles, Battery, Wand2, PartyPopper, Eye, Lightbulb, Loader2 } from "lucide-react";
+import { detectPatterns } from "@/lib/patterns.functions";
 
 export const Route = createFileRoute("/_authenticated/insights")({
   component: InsightsPage,
@@ -24,7 +26,17 @@ function calcStreak(events: Event[]) {
   return streak;
 }
 
+const TONE_ICON = {
+  celebrate: PartyPopper,
+  notice: Eye,
+  experiment: Lightbulb,
+} as const;
+
 function InsightsPage() {
+  const detect = useServerFn(detectPatterns);
+  const patterns = useMutation({
+    mutationFn: () => detect(),
+  });
   const { data } = useQuery({
     queryKey: ["insights"],
     queryFn: async () => {
@@ -130,6 +142,57 @@ function InsightsPage() {
         <p className="text-[11px] text-muted-foreground mt-3">
           No bars means no shame — just data you haven't logged yet.
         </p>
+      </div>
+
+      <div className="rounded-2xl border border-border bg-card p-5 space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Wand2 className="h-4 w-4 text-muted-foreground" />
+            <p className="text-sm font-medium">Patterns</p>
+          </div>
+          <button
+            onClick={() => patterns.mutate()}
+            disabled={patterns.isPending}
+            className="text-xs px-3 py-1.5 rounded-full bg-primary text-primary-foreground disabled:opacity-60 flex items-center gap-1.5"
+          >
+            {patterns.isPending ? (
+              <>
+                <Loader2 className="h-3 w-3 animate-spin" /> Reading
+              </>
+            ) : (
+              "Reflect"
+            )}
+          </button>
+        </div>
+        {patterns.data?.insights?.length ? (
+          <ul className="space-y-2.5">
+            {patterns.data.insights.map((ins, i) => {
+              const Icon = TONE_ICON[ins.tone] ?? Eye;
+              return (
+                <li
+                  key={i}
+                  className="rounded-xl border border-border bg-background/40 p-3"
+                >
+                  <div className="flex items-start gap-2.5">
+                    <span className="mt-0.5 h-7 w-7 shrink-0 rounded-lg bg-primary/15 text-primary flex items-center justify-center">
+                      <Icon className="h-3.5 w-3.5" />
+                    </span>
+                    <div>
+                      <p className="text-sm font-medium leading-tight">{ins.title}</p>
+                      <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                        {ins.body}
+                      </p>
+                    </div>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        ) : (
+          <p className="text-xs text-muted-foreground">
+            Tap Reflect for a gentle AI read of the last 30 days. No judgment, just patterns.
+          </p>
+        )}
       </div>
     </div>
   );

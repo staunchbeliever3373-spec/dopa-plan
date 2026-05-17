@@ -139,6 +139,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          active_theme_id: string | null
           created_at: string
           display_name: string | null
           id: string
@@ -146,6 +147,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          active_theme_id?: string | null
           created_at?: string
           display_name?: string | null
           id: string
@@ -153,13 +155,22 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          active_theme_id?: string | null
           created_at?: string
           display_name?: string | null
           id?: string
           timezone?: string | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_active_theme_id_fkey"
+            columns: ["active_theme_id"]
+            isOneToOne: false
+            referencedRelation: "themes"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       tasks: {
         Row: {
@@ -222,6 +233,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      themes: {
+        Row: {
+          created_at: string
+          id: string
+          is_preset: boolean
+          name: string
+          tokens: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_preset?: boolean
+          name: string
+          tokens: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_preset?: boolean
+          name?: string
+          tokens?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
     }
     Views: {

@@ -2,7 +2,7 @@ import { createFileRoute, redirect, Outlet, Link, useNavigate } from "@tanstack/
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
-import { Brain, Calendar, LogOut } from "lucide-react";
+import { Brain, Calendar, LogOut, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authenticated")({
